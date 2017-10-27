@@ -1,0 +1,7 @@
+DAWG-Python==0.7.2
+docopt==0.6.2
+nltk==3.2.5
+pymorphy2==0.8
+pymorphy2-dicts==2.4.393442.3710985
+six==1.11.0
+wiki-ru-wordnet==1.0.3
