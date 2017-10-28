@@ -20,7 +20,10 @@ services:
     network_mode: host
     volumes:
       - './default.conf:/etc/nginx/conf.d/default.conf:ro'
+      - './tnlp.conf:/etc/nginx/conf.d/tnlp.conf:ro'
       - './certs:/var/tmp/certs'
       - './acme:/var/tmp/acme'
+      - './builded_frontend:/var/tmp/builded_frontend'
+
     ports:
       - 80:80
