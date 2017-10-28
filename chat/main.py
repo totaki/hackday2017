@@ -13,7 +13,7 @@ define('port', default=8000, type=int)
 define('MICROSOFT_APP_ID',
        default=getenv('MICROSOFT_APP_ID', None), group='application')
 define('MICROSOFT_APP_PASSWORD',
-       default=getenv('MICROSOFT_APP_ID', None), group='application')
+       default=getenv('MICROSOFT_APP_PASSWORD', None), group='application')
 define(
     'MICROSOFT_OAUTH_URL',
     default='https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token',
