@@ -84,7 +84,7 @@ class InWebhookHadler(BaseHandler):
                     'suggests': self.get_suggests(activity.text),
                     'id': id
                 }
-                MESSAGES_DEQUE.extend([message] * options.count_accept)
+                MESSAGES_DEQUE.extend([message] * int(options.count_accept))
         self.finish({})
 
     @staticmethod
@@ -99,7 +99,7 @@ class OutWebhookHadler(BaseHandler):
         id = self.get_body_argument('id')
         response = RESPONSES[id]
         response['responses'].append(message)
-        if len(response['responses']) == options.count_accept:
+        if len(response['responses']) == int(options.count_accept):
             response_obj = RESPONSES.pop(id)
             counts = Counter(response_obj['responses'])
             max_possible = sorted(counts, key=lambda x: counts[x], reverse=True)
