@@ -33,9 +33,6 @@ class NamedEntitiesExtractor:
             })
         return result
 
-    def match_to_dict(self, match):
-        pass
-
     def process(self, text_object):
         text = get_text(text_object)
         result = []

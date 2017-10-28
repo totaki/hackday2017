@@ -12,7 +12,7 @@ from processing.utils import load_stopwords, get_text
 
 class BaseProcessor:
     @staticmethod
-    async def process(text_object):
+    def process(text_object):
         raise NotImplementedError
 
 
@@ -21,7 +21,7 @@ class WordTokenizer(BaseProcessor):
     Returns list of words tokens
     """
     @staticmethod
-    async def process(text_object):
+    def process(text_object):
         text = get_text(text_object)
         tokens = nltk.word_tokenize(text)
         text_object.update({'word_tokens': tokens})
@@ -33,7 +33,7 @@ class SentenceTokenizer(BaseProcessor):
     Returns list of sentences tokens
     """
     @staticmethod
-    async def process(text_object):
+    def process(text_object):
         text = get_text(text_object)
         sent_tokenizer = PunktSentenceTokenizer()
         tokens = sent_tokenizer.sentences_from_text(text)
@@ -43,7 +43,7 @@ class SentenceTokenizer(BaseProcessor):
 
 class Lemmatizer(BaseProcessor):
     @staticmethod
-    async def process(text_object):
+    def process(text_object):
         tokens = text_object.get('word_tokens')
         if not tokens:
             text_object = WordTokenizer.process(text_object)
@@ -61,10 +61,10 @@ class Lemmatizer(BaseProcessor):
 class POSTagger(BaseProcessor):
 
     @staticmethod
-    async def process(text_object):
+    def process(text_object):
         tokens = text_object.get('word_tokens')
         if not tokens:
-            text_object = await WordTokenizer.process(text_object)
+            text_object = WordTokenizer.process(text_object)
             tokens = text_object['word_tokens']
         result = []
         morph = pymorphy2.MorphAnalyzer()
@@ -82,17 +82,17 @@ class POSTagger(BaseProcessor):
 class SyntaxTagger(BaseProcessor):
 
     @staticmethod
-    async def process(text_object):
+    def process(text_object):
         tokens = text_object.get('sentence_tokens')
         if not tokens:
-            text_object = await SentenceTokenizer.process(text_object)
+            text_object = SentenceTokenizer.process(text_object)
             tokens = text_object['sentence_tokens']
         result = []
         http = AsyncHTTPClient()
         for token in tokens:
             request = HTTPRequest('http://localhost:9999/parse?text={}'.format(token), request_timeout=30)
             # request = HTTPRequest('/parse?text={}'.format(token), request_timeout=30)
-            response = await http.fetch(request)
+            response = http.fetch(request)
             parsed_data = json_decode(response.body)
             result.append(parsed_data)
         text_object.update({'syntax_tagging': result})
@@ -102,7 +102,7 @@ class SyntaxTagger(BaseProcessor):
 
 class PunctuationCleaner(BaseProcessor):
     @staticmethod
-    async def process(text_object):
+    def process(text_object):
         text = get_text(text_object)
         punctuation_table = str.maketrans("", "", string.punctuation)
         text = text.translate(punctuation_table).lower()
@@ -112,7 +112,7 @@ class PunctuationCleaner(BaseProcessor):
 
 class EmojiCleaner(BaseProcessor):
     @staticmethod
-    async def process(text_object):
+    def process(text_object):
         text = get_text(text_object)
         try:
             patt = re.compile('[U00010000-U0010ffff]', re.UNICODE)
@@ -124,7 +124,7 @@ class EmojiCleaner(BaseProcessor):
 
 class StopwordsCleaner(BaseProcessor):
     @staticmethod
-    async def process(text_object):
+    def process(text_object):
         text = get_text(text_object)
         stop_words = load_stopwords()
         words = []
@@ -140,7 +140,7 @@ class StopwordsCleaner(BaseProcessor):
 class LinksCleaner(BaseProcessor):
 
     @staticmethod
-    async def process(text_object):
+    def process(text_object):
         text = get_text(text_object)
         text_object.update(
             {'prep_text': re.sub('((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)', '', text)}
@@ -150,7 +150,7 @@ class LinksCleaner(BaseProcessor):
 
 class IndentsCleaner(BaseProcessor):
     @staticmethod
-    async def process(text_object):
+    def process(text_object):
         text = get_text(text_object)
         text_object.update({'prep_text':  re.sub(r'[\n\t\r]', ' ', text)})
         return text_object
@@ -158,7 +158,7 @@ class IndentsCleaner(BaseProcessor):
 
 class AlphabetCleaner(BaseProcessor):
     @staticmethod
-    async def process(text_object):
+    def process(text_object):
         text = get_text(text_object)
         letters = u'а-яА-ЯёЁa-zA-Z'
         text = re.sub('[^{}]'.format(letters), ' ', text)
@@ -168,7 +168,7 @@ class AlphabetCleaner(BaseProcessor):
 
 class StemmingProcessor:
     @staticmethod
-    async def process(text_object):
+    def process(text_object):
         stemmer = nltk.SnowballStemmer('russian')
         text = get_text(text_object)
         text_object.update(
@@ -179,7 +179,7 @@ class StemmingProcessor:
 
 class CharsReplaceProcessor(BaseProcessor):
     @staticmethod
-    async def process(text_object):
+    def process(text_object):
         text = get_text(text_object)
         text = re.sub('ё', 'е', text)
         text_object.update({'prep_text': re.sub('Ё', 'Е', text)})
@@ -188,7 +188,7 @@ class CharsReplaceProcessor(BaseProcessor):
 
 class LowerCaseProcessor(BaseProcessor):
     @staticmethod
-    async def process(text_object):
+    def process(text_object):
         text = get_text(text_object)
         text_object.update({'prep_text': text.lower()})
         return text_object
