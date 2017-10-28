@@ -1,19 +1,26 @@
+import json
+
 import tornado.web
 from tornado import gen
 
 from mapper import mapper
 
+
 class PipelinesHandler(tornado.web.RequestHandler):
     @gen.coroutine
     def get(self):
+        text = self.get_argument('text')
+        processors = self.get_argument('processors')
+        if not isinstance(processors, list):
+            processors = [processors]
+        processors = ['chars_replace', 'lowercase'] + processors
         text_object = {
-            'text': """ Моя доргая !ненастная ПОГОДА как) ты уже мне надоела"""
+            'text': text
         }
-        processors = ['punctuation_cleaner', 'alphabet_cleaner', 'speller', 'lemmatizer']
         for processor in processors:
             text_object = mapper[processor].process(text_object)
-        print(text_object)
-        self.finish(text_object)
+
+        self.finish(json.dumps(text_object))
 
 
 class TestHandler(tornado.web.RequestHandler):

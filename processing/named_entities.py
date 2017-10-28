@@ -3,6 +3,8 @@ from pprint import pprint
 from natasha import (NamesExtractor, DatesExtractor, MoneyExtractor, LocationExtractor, AddressExtractor,
                      OrganisationExtractor, PersonExtractor)
 
+from utils import get_text
+
 
 class NamedEntitiesExtractor:
     extractors = []
@@ -33,10 +35,16 @@ class NamedEntitiesExtractor:
             })
         return result
 
-    def extract_all(self, text):
+    def match_to_dict(self, match):
+        pass
+
+    def process(self, text_object):
+        text = get_text(text_object)
         result = []
         for extractor in self.extractors:
             result.extend(self.extract(text, extractor))
+        text_object.update(
+            {'named_entities': result})
         return result
 
 
@@ -49,4 +57,5 @@ if __name__ == '__main__':
     представителей бестиария японской мифологии, тем самым совершил
     преступление, предусмотренное статьей 148 УК РФ от 1 декабря 2017 года
     '''
+    text_object = {'text': text}
     pprint(extractors.extract_all(text))
