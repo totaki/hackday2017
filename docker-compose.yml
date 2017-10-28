@@ -2,7 +2,7 @@ version: "2"
 
 services:
   chatapp:
-    image: mashrooms:0.1
+    image: mashrooms:0.2
     build:
       context: ./chat
     network_mode: host
@@ -11,6 +11,9 @@ services:
       - MICROSOFT_APP_PASSWORD=${MICROSOFT_APP_PASSWORD}
       - debug=${debug}
       - count_accept=1
+    volumes:
+      - ./chat:/srv/chatapp
+    command: "python3 main.py"
 
   nginx:
     image: nginx:latest
