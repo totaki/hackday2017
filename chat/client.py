@@ -56,14 +56,14 @@ class SkypeClient(object):
 
     async def _fetch_bot_token(self):
         client = AsyncHTTPClient()
+        if options.debug:
+            logging.error('{} {}'.format(self.access_token_data['token_type'], self.access_token))
+            logging.error(options.MICROSOFT_APP_ID)
+            logging.error(options.MICROSOFT_APP_PASSWORD)
         response = await client.fetch(
             self.oauth_url,
             method='POST',
             body=self.auth_credentials,
             headers={'Content-Type': 'application/x-www-form-urlencoded'},
         )
-        if options.debug:
-            logging.error('{} {}'.format(self.access_token_data['token_type'], self.access_token))
-            logging.error(options.MICROSOFT_APP_ID)
-            logging.error(options.MICROSOFT_APP_PASSWORD)
         return json2data(response.body)
