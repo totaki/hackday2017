@@ -1,3 +1,4 @@
+from os import getenv
 import tornado.ioloop
 import tornado.web
 from routes import routes
@@ -9,8 +10,10 @@ from client import SkypeClient
 define('debug', default=True, type=bool)
 define('port', default=8000, type=int)
 
-define('MICROSOFT_APP_ID', group='application')
-define('MICROSOFT_APP_PASSWORD', group='application')
+define('MICROSOFT_APP_ID',
+       default=getenv('MICROSOFT_APP_ID', None), group='application')
+define('MICROSOFT_APP_PASSWORD',
+       default=getenv('MICROSOFT_APP_ID', None), group='application')
 define(
     'MICROSOFT_OAUTH_URL',
     default='https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token',
