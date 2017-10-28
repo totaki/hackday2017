@@ -2,7 +2,7 @@ from natasha import (NamesExtractor, DatesExtractor, MoneyExtractor, LocationExt
                      OrganisationExtractor, PersonExtractor)
 
 
-class NamedEntitiesExtractor:
+class NamedEntitiesExtractorsLoader:
     dates_extractor = None
     money_extractor = None
     location_extractor = None
@@ -11,20 +11,21 @@ class NamedEntitiesExtractor:
     person_extractor = None
 
     def __init__(self):
-        self.dates_extractor = DatesExtractor()
-        self.names_extractor = NamesExtractor()
-        self.money_extractor = MoneyExtractor()
-        self.location_extractor = LocationExtractor()
-        self.address_extractor = AddressExtractor()
-        self.organization_extractor = OrganisationExtractor()
-        self.person_extractor = PersonExtractor()
+        self.date = DatesExtractor()
+        self.name = NamesExtractor()
+        self.money = MoneyExtractor()
+        self.location = LocationExtractor()
+        self.address = AddressExtractor()
+        self.organization = OrganisationExtractor()
+        self.person = PersonExtractor()
 
-    def extract_dates(self, text):
+    def extract(self, text, extractor):
         result = []
-        matches = self.dates_extractor(text)
+        matches = getattr(self, extractor)(text)
         for match in matches:
             result.append({
                 "span": match.span,
                 "fact": match.fact
             })
         return result
+
