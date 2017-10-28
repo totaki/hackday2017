@@ -4,6 +4,9 @@ import pymorphy2
 import string
 import re
 
+from tornado.escape import json_decode
+from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+
 from processing.utils import load_stopwords, get_text
 
 
@@ -30,17 +33,21 @@ class SentenceTokenizer(BaseProcessor):
     Returns list of sentences tokens
     """
     @staticmethod
-    def process(text):
+    def process(text_object):
+        text = get_text(text_object)
         sent_tokenizer = PunktSentenceTokenizer()
         tokens = sent_tokenizer.sentences_from_text(text)
-        return tokens
+        text_object.update({'sentence_tokens': tokens})
+        return text_object
 
 
 class Lemmatizer(BaseProcessor):
     @staticmethod
     def process(text_object):
-        if not text_object.get('word_tokens'):
-            tokens = WordTokenizer.process(text_object)['word_tokens']
+        tokens = text_object.get('word_tokens')
+        if not tokens:
+            text_object = WordTokenizer.process(text_object)
+            tokens = text_object['word_tokens']
         result = []
         morph = pymorphy2.MorphAnalyzer()
         for token in tokens:
@@ -55,8 +62,10 @@ class POSTagger(BaseProcessor):
 
     @staticmethod
     def process(text_object):
-        if not text_object.get('word_tokens'):
-            tokens = WordTokenizer.process(text_object)['word_tokens']
+        tokens = text_object.get('word_tokens')
+        if not tokens:
+            text_object = WordTokenizer.process(text_object)
+            tokens = text_object['word_tokens']
         result = []
         morph = pymorphy2.MorphAnalyzer()
         for token in tokens:
@@ -66,7 +75,27 @@ class POSTagger(BaseProcessor):
                 'POS': parsed.tag.POS
             }
             result.append(data)
-        text_object.update({'pos': result})
+        text_object.update({'pos_tagging': result})
+        return text_object
+
+
+class SyntaxTagger(BaseProcessor):
+
+    @staticmethod
+    async def process(text_object):
+        tokens = text_object.get('sentence_tokens')
+        if not tokens:
+            text_object = WordTokenizer.process(text_object)
+            tokens = text_object['sentence_tokens']
+        result = []
+        http = AsyncHTTPClient()
+        for token in tokens:
+            request = HTTPRequest('http://localhost:9999/parse?text={}'.format(token), request_timeout=30)
+            response = await http.fetch(request)
+            parsed_data = json_decode(response.body)
+            result.append(parsed_data)
+        text_object.update({'syntax_tagging': result})
+        print(text_object)
         return text_object
 
 
