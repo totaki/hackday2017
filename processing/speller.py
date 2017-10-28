@@ -14,8 +14,8 @@ class Speller(YandexSpeller):
 
 
 if __name__ == '__main__':
-    text = """
+    text = {"text": """
     я вшел из дома кагда во всех онах
-    """
+    """}
     speller = Speller()
     print(speller.process(text))

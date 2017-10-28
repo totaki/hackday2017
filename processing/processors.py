@@ -18,9 +18,11 @@ class WordTokenizer(BaseProcessor):
     Returns list of words tokens
     """
     @staticmethod
-    def process(text):
+    def process(text_object):
+        text = get_text(text_object)
         tokens = nltk.word_tokenize(text)
-        return tokens
+        text_object.update({'word_tokens': tokens})
+        return text_object
 
 
 class SentenceTokenizer(BaseProcessor):
@@ -35,11 +37,10 @@ class SentenceTokenizer(BaseProcessor):
 
 
 class Lemmatizer(BaseProcessor):
-
     @staticmethod
-    def process(tokens):
-        if not isinstance(tokens, (list, tuple)):
-            raise ValueError
+    def process(text_object):
+        if not text_object.get('word_tokens'):
+            tokens = WordTokenizer.process(text_object)['word_tokens']
         result = []
         morph = pymorphy2.MorphAnalyzer()
         for token in tokens:
@@ -52,9 +53,9 @@ class Lemmatizer(BaseProcessor):
 class POSTagger(BaseProcessor):
 
     @staticmethod
-    def process(tokens):
-        if not isinstance(tokens, (list, tuple)):
-            raise ValueError
+    def process(text_object):
+        if not text_object.get('word_tokens'):
+            tokens = WordTokenizer.process(text_object)['word_tokens']
         result = []
         morph = pymorphy2.MorphAnalyzer()
         for token in tokens:
@@ -64,7 +65,8 @@ class POSTagger(BaseProcessor):
                 'POS': parsed.tag.POS
             }
             result.append(data)
-        return result
+        text_object.update({'pos': result})
+        return text_object
 
 
 class PunctuationCleaner(BaseProcessor):
@@ -73,7 +75,7 @@ class PunctuationCleaner(BaseProcessor):
         text = get_text(text_object)
         punctuation_table = str.maketrans("", "", string.punctuation)
         text = text.translate(punctuation_table).lower()
-        text_object.update({'text': text})
+        text_object.update({'prep_text': text})
         return text_object
 
 
@@ -154,10 +156,11 @@ class CharsReplaceProcessor(BaseProcessor):
 
 
 class LowerCaseProcessor(BaseProcessor):
-
     @staticmethod
     def process(text_object):
-        return text.lower()
+        text = get_text(text_object)
+        text_object.update({'prep_text': text.lower()})
+        return text_object
 
 
 if __name__ == '__main__':

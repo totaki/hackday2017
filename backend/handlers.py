@@ -9,7 +9,7 @@ class PipelinesHandler(tornado.web.RequestHandler):
         text_object = {
             'text': """ Моя доргая !ненастная ПОГОДА как) ты уже мне надоела"""
         }
-        processors = ['punctuation_cleaner', 'alphabet_cleaner']
+        processors = ['punctuation_cleaner', 'alphabet_cleaner', 'speller', 'lemmatizer']
         for processor in processors:
             text_object = mapper[processor].process(text_object)
         print(text_object['prep_text'])
