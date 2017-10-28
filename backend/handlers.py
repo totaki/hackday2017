@@ -12,7 +12,7 @@ class PipelinesHandler(tornado.web.RequestHandler):
         processors = ['punctuation_cleaner', 'alphabet_cleaner', 'speller', 'lemmatizer']
         for processor in processors:
             text_object = mapper[processor].process(text_object)
-        print(text_object['prep_text'])
+        print(text_object)
         self.finish(text_object)
 
 

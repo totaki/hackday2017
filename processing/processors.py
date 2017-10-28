@@ -47,7 +47,8 @@ class Lemmatizer(BaseProcessor):
             parsed = morph.parse(token)[0]
             if hasattr(parsed, 'normal_form'):
                 result.append(parsed.normal_form)
-        return result
+        text_object.update({'lemm_text': ' '.join(result)})
+        return text_object
 
 
 class POSTagger(BaseProcessor):
