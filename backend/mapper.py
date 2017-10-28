@@ -1,6 +1,6 @@
-from named_entities import NamedEntitiesExtractor
-from speller import Speller
-from processors import *
+from processing.named_entities import NamedEntitiesExtractor
+from processing.speller import Speller
+from processing.processors import *
 
 mapper = {
     'speller': Speller(),
@@ -9,6 +9,7 @@ mapper = {
     "sentence_tokenizer": SentenceTokenizer(),
     "lemmatizer": Lemmatizer(),
     "pos_tagger": POSTagger(),
+    "syntax_tagger": SyntaxTagger(),
     "punctuation_cleaner": PunctuationCleaner(),
     "emoji_cleaner": EmojiCleaner(),
     "stopwords_cleaner": StopwordsCleaner(),
