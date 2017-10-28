@@ -57,7 +57,6 @@ class SkypeClient(object):
     async def _fetch_bot_token(self):
         client = AsyncHTTPClient()
         if options.debug:
-            logging.error('{} {}'.format(self.access_token_data['token_type'], self.access_token))
             logging.error(options.MICROSOFT_APP_ID)
             logging.error(options.MICROSOFT_APP_PASSWORD)
         response = await client.fetch(
