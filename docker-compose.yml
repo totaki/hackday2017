@@ -9,7 +9,7 @@ services:
     environment:
       - MICROSOFT_APP_ID=${MICROSOFT_APP_ID}
       - MICROSOFT_APP_PASSWORD=${MICROSOFT_APP_PASSWORD}
-      - debug=false
+      - debug=${debug}
       - count_accept=1
 
   nginx:
