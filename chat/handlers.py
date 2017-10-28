@@ -47,7 +47,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class DropStateHandler(BaseHandler):
 
-    def post(self):
+    def get(self):
         clean_store()
         self.client.clean_token()
         self.finish({})
