@@ -49,7 +49,7 @@ class DropStateHandler(BaseHandler):
 
     def get(self):
         clean_store()
-        self.client.clean_token()
+        self.client.remove_token()
         self.finish({})
 
 
