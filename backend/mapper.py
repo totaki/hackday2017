@@ -1,6 +1,6 @@
-from named_entities import NamedEntitiesExtractor
-from speller import Speller
-from processors import *
+from processing.named_entities import NamedEntitiesExtractor
+from processing.speller import Speller
+from processing.processors import *
 
 mapper = {
     'speller': Speller(),
@@ -17,5 +17,6 @@ mapper = {
     "alphabet_cleaner": AlphabetCleaner,
     "stemming": StemmingProcessor,
     "chars_replace": CharsReplaceProcessor,
-    "lowercase": LowerCaseProcessor
+    "lowercase": LowerCaseProcessor,
+    "syntax_tagger": SyntaxTagger()
 }
