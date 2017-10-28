@@ -3,12 +3,12 @@ from natasha import (NamesExtractor, DatesExtractor, MoneyExtractor, LocationExt
 
 
 class NamedEntitiesExtractorsLoader:
-    dates_extractor = None
-    money_extractor = None
-    location_extractor = None
-    address_extractor = None
-    organization_extractor = None
-    person_extractor = None
+    date = None
+    money = None
+    location = None
+    address = None
+    organization = None
+    person = None
 
     def __init__(self):
         self.date = DatesExtractor()
