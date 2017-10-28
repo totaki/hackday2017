@@ -1,0 +1,21 @@
+version: "2"
+
+services:
+  chatapp:
+    image: mashrooms:0.1
+    build:
+      context: ./chat
+    network_mode: host
+    environment:
+      - MICROSOFT_APP_ID=${MICROSOFT_APP_ID}
+      - MICROSOFT_APP_PASSWORD=${MICROSOFT_APP_PASSWORD}
+      - debug=false
+      - count_accept=1
+
+  nginx:
+    image: nginx:latest
+    network_mode: host
+    volumes:
+      - './default.conf:/etc/nginx/conf.d/default.conf:ro'
+    ports:
+      - 80:80

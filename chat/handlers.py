@@ -2,12 +2,13 @@ import pprint
 import uuid
 
 import tornado.web
+from os import getenv
 from collections import deque, Counter
 from tornado.ioloop import IOLoop
 from tornado.options import options, define
 from attr_dict import AttrDict
 
-define('count_accept',default=1, type=1)
+define('count_accept', default=getenv('count_accept', 1), type=int)
 
 
 MESSAGES_DEQUE = deque()
