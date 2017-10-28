@@ -16,8 +16,6 @@ class PipelinesHandler(tornado.web.RequestHandler):
             'text': text
         }
         for processor in processors:
-            text_object = mapper[processor].process(text_object)
+            text_object = await mapper[processor].process(text_object)
 
         self.finish(json.dumps(text_object))
-
-
