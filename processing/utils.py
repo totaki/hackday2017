@@ -14,3 +14,8 @@ def load_stopwords(stopwords_file='stopwords.txt'):
             lines = [r_unwanted.sub('', line) for line in lines]
             stop_words += lines
 
+
+def get_text(text_object):
+    text = text_object['text'] if not text_object.get('prep_text') else text_object['prep_text']
+    return text
+

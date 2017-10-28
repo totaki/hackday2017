@@ -4,7 +4,7 @@ from natasha import (NamesExtractor, DatesExtractor, MoneyExtractor, LocationExt
                      OrganisationExtractor, PersonExtractor)
 
 
-class NamedEntitiesExtractorsLoader:
+class NamedEntitiesExtractor:
     extractors = []
     date = None
     money = None
@@ -41,7 +41,7 @@ class NamedEntitiesExtractorsLoader:
 
 
 if __name__ == '__main__':
-    extractors = NamedEntitiesExtractorsLoader()
+    extractors = NamedEntitiesExtractor()
     text = '''
     Простите, еще несколько цитат из приговора. одна копейка «…Отрицал существование
     Иисуса и пророка Мухаммеда», «наделял Иисуса Христа качествами

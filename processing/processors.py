@@ -4,12 +4,12 @@ import pymorphy2
 import string
 import re
 
-from processing.utils import load_stopwords
+from processing.utils import load_stopwords, get_text
 
 
 class BaseProcessor:
     @staticmethod
-    def process(text):
+    def process(text_object):
         raise NotImplementedError
 
 
@@ -69,28 +69,30 @@ class POSTagger(BaseProcessor):
 
 class PunctuationCleaner(BaseProcessor):
     @staticmethod
-    def process(text):
+    def process(text_object):
+        text = get_text(text_object)
         punctuation_table = str.maketrans("", "", string.punctuation)
         text = text.translate(punctuation_table).lower()
-        return text
+        text_object.update({'text': text})
+        return text_object
 
 
 class EmojiCleaner(BaseProcessor):
     @staticmethod
-    def process(text):
+    def process(text_object):
+        text = get_text(text_object)
         try:
-            # UCS-4
             patt = re.compile('[U00010000-U0010ffff]', re.UNICODE)
         except re.error:
-            # UCS-2
             patt = re.compile('[uD800-uDBFF][uDC00-uDFFF]', re.UNICODE)
-        return patt.sub('', text)
+        text_object.update({'prep_text': patt.sub('', text)})
+        return text_object
 
 
 class StopwordsCleaner(BaseProcessor):
-
     @staticmethod
-    def process(text):
+    def process(text_object):
+        text = get_text(text_object)
         stop_words = load_stopwords()
         words = []
         for word in re.split(r'[,:;!?*()+ ]', text):
@@ -98,53 +100,63 @@ class StopwordsCleaner(BaseProcessor):
                 cleaned_word = AlphabetCleaner.process(word).strip()
                 if cleaned_word and (cleaned_word not in stop_words):
                     words.append(cleaned_word)
-        return ' '.join(words)
+        text_object.update({'prep_text': text})
+        return text_object
 
 
 class LinksCleaner(BaseProcessor):
 
     @staticmethod
-    def process(text):
-        return re.sub('((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)', '', text)
+    def process(text_object):
+        text = get_text(text_object)
+        text_object.update(
+            {'prep_text': re.sub('((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)', '', text)}
+        )
+        return text_object
 
 
 class IndentsCleaner(BaseProcessor):
-
     @staticmethod
-    def process(text):
-        result = re.sub(r'[\n\t\r]', ' ', text)
-        return result
+    def process(text_object):
+        text = get_text(text_object)
+        text_object.update({'prep_text':  re.sub(r'[\n\t\r]', ' ', text)})
+        return text_object
 
 
 class AlphabetCleaner(BaseProcessor):
-
     @staticmethod
-    def process(text):
+    def process(text_object):
+        text = get_text(text_object)
         letters = u'а-яА-ЯёЁa-zA-Z'
         text = re.sub('[^{}]'.format(letters), ' ', text)
-        return text
+        text_object.update({'prep_text': text})
+        return text_object
 
 
 class StemmingProcessor:
-
     @staticmethod
-    def process(text):
+    def process(text_object):
         stemmer = nltk.SnowballStemmer('russian')
-        return ' '.join([stemmer.stem(w) for w in text.split() if len(w) > 1])
+        text = get_text(text_object)
+        text_object.update(
+            {'prep_text': ' '.join([stemmer.stem(w) for w in text.split() if len(w) > 1])}
+        )
+        return text_object
 
 
 class CharsReplaceProcessor(BaseProcessor):
-
     @staticmethod
-    def process(text):
+    def process(text_object):
+        text = get_text(text_object)
         text = re.sub('ё', 'е', text)
-        return re.sub('Ё', 'Е', text)
+        text_object.update({'prep_text': re.sub('Ё', 'Е', text)})
+        return text_object
 
 
 class LowerCaseProcessor(BaseProcessor):
 
     @staticmethod
-    def process(text):
+    def process(text_object):
         return text.lower()
 
 
