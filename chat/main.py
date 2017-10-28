@@ -7,7 +7,7 @@ from tornado.options import options, define
 from client import SkypeClient
 
 
-define('debug', default=True, type=bool)
+define('debug', default=getenv('debug', False), type=bool)
 define('port', default=8000, type=int)
 
 define('MICROSOFT_APP_ID',
