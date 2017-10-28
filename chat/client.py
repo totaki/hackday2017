@@ -1,5 +1,6 @@
 import json
 import urllib.parse
+import logging
 from tornado.options import options
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 
@@ -50,11 +51,6 @@ class SkypeClient(object):
             'Content-Type': 'application/json',
             'Authorization': '{} {}'.format(self.access_token_data['token_type'], self.access_token)
         })
-        if options.debug:
-            print(json_data)
-            print('{} {}'.format(self.access_token_data['token_type'], self.access_token))
-            print(options.MICROSOFT_APP_ID)
-            print(options.MICROSOFT_APP_PASSWORD)
         response = await client.fetch(request=request)
         return json2data(response.body)
 
@@ -66,4 +62,8 @@ class SkypeClient(object):
             body=self.auth_credentials,
             headers={'Content-Type': 'application/x-www-form-urlencoded'},
         )
+        if options.debug:
+            logging.error('{} {}'.format(self.access_token_data['token_type'], self.access_token))
+            logging.error(options.MICROSOFT_APP_ID)
+            logging.error(options.MICROSOFT_APP_PASSWORD)
         return json2data(response.body)
