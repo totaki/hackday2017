@@ -1,4 +1,5 @@
 import nltk
+import requests
 from nltk.tokenize import PunktSentenceTokenizer
 import pymorphy2
 import string
@@ -88,12 +89,16 @@ class SyntaxTagger(BaseProcessor):
             text_object = SentenceTokenizer.process(text_object)
             tokens = text_object['sentence_tokens']
         result = []
+
         http = AsyncHTTPClient()
+
         for token in tokens:
-            request = HTTPRequest('http://localhost:9999/parse?text={}'.format(token), request_timeout=30)
+            url = 'http://localhost:9999/parse?text={}'.format(token)
+            response = requests.get(url)
+            parsed_data = response.json()
             # request = HTTPRequest('/parse?text={}'.format(token), request_timeout=30)
-            response = http.fetch(request)
-            parsed_data = json_decode(response.body)
+            # response = await http.fetch(request)
+            # parsed_data = json_decode(response.body)
             result.append(parsed_data)
         text_object.update({'syntax_tagging': result})
         print(text_object)

@@ -11,7 +11,7 @@ class PipelinesHandler(tornado.web.RequestHandler):
         processors = self.get_argument('processors')
         if not isinstance(processors, list):
             processors = [processors]
-        async_processors = ['syntax_tagger']
+        async_processors = []
         processors = ['chars_replace', 'lowercase'] + processors
         text_object = {
             'text': text

@@ -18,5 +18,5 @@ mapper = {
     "stemming": StemmingProcessor,
     "chars_replace": CharsReplaceProcessor,
     "lowercase": LowerCaseProcessor,
-    "syntax_tagger": SyntaxTagger()
+    "syntax_tagger": SyntaxTagger,
 }
