@@ -15,6 +15,7 @@ class PipelinesHandler(tornado.web.RequestHandler):
         text_object = {
             'text': text
         }
+        # Reset
         for processor in processors:
             text_object = await mapper[processor].process(text_object)
 
