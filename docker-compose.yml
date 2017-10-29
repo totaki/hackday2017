@@ -23,6 +23,14 @@ services:
     volumes:
       - ./processing/syntaxnet:/opt/tensorflow/syntaxnet
 
+  syntaxnet:
+    image: processing:0.1
+    build:
+      context: ./backend
+    network_mode: host
+    volumes:
+      - ./backend:/srv/processing
+
   nginx:
     image: nginx:latest
     network_mode: host
