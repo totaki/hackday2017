@@ -141,10 +141,11 @@ class StopwordsCleaner(BaseProcessor):
         words = []
         for word in re.split(r'[,:;!?*()+ ]', text):
             if word:
-                cleaned_word = AlphabetCleaner.process(word).strip()
+                word_object = {'text': word}
+                cleaned_word = AlphabetCleaner.process(word_object)['prep_text'].strip()
                 if cleaned_word and (cleaned_word not in stop_words):
                     words.append(cleaned_word)
-        text_object.update({'prep_text': text})
+        text_object.update({'prep_text': ' '.join(words)})
         return text_object
 
 
