@@ -111,7 +111,7 @@ class InWebhookHadler(BaseHandler):
             sl = en.get('span')
             if sl:
                 put = '*' * (sl[1] - sl[0])
-                text = text[0: sl[0]] + put + text[sl[1]:]
+                text = ' '.join([text[0: sl[0]], put, text[sl[1]:]])
         logging.warning(text)
         raise gen.Return(text)
 
