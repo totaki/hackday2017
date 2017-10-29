@@ -120,6 +120,7 @@ class InWebhookHadler(BaseHandler):
         self.finish({})
 
     @staticmethod
+    # TODO: insert here
     async def get_suggests(text):
         client = AsyncHTTPClient()
         data = urllib.parse.urlencode({
