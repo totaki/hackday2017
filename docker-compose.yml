@@ -23,7 +23,7 @@ services:
     volumes:
       - ./processing/syntaxnet:/opt/tensorflow/syntaxnet
 
-  syntaxnet:
+  processing:
     image: processing:0.1
     build:
       context: ./backend
