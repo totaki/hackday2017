@@ -115,10 +115,11 @@ class InWebhookHadler(BaseHandler):
                     'senders': [],
                     'created_at': datetime.utcnow().timestamp()
                 }
+                suggests = yield self.get_suggests(activity.text)
                 MESSAGES_DEQUE.extend([
                     {
                         'text': activity.text,
-                        'suggests': (yield self.get_suggests(activity.text)),
+                        'suggests': suggests,
                         'id': id
                     }
                     for i in range(int(options.count_accept))
