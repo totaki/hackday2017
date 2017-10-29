@@ -63,7 +63,7 @@ class StatusHandler(BaseHandler):
         message = None
         if len(MESSAGES_DEQUE):
             index = -1
-            while abs(index) != len(MESSAGES_DEQUE):
+            while abs(index) < len(MESSAGES_DEQUE):
                 message_ = MESSAGES_DEQUE[index]
                 responses = RESPONSES[message_['id']]
                 if user_id not in responses['senders']:
