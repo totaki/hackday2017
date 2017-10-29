@@ -11,6 +11,7 @@ services:
       - MICROSOFT_APP_PASSWORD=${MICROSOFT_APP_PASSWORD}
       - debug=${debug}
       - count_accept=${count_accept}
+      - WIT_TOKEN=${WIT_TOKEN}
     volumes:
       - ./chat:/srv/chatapp
     command: "python3 main.py"

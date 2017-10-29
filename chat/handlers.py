@@ -1,20 +1,32 @@
 import logging
 import pprint
+import urllib.parse
 import uuid
+import json
+
 from datetime import datetime
 
 import tornado.web
 from os import getenv
 from collections import Counter
+
+from tornado.httpclient import AsyncHTTPClient
 from tornado.ioloop import IOLoop
 from tornado.options import options, define
 from attr_dict import AttrDict
 
 define('count_accept', default=getenv('count_accept', 1), type=int)
+define('WIT_TOKEN', default=getenv('WIT_TOKEN', 1), type=str)
 
 
 MESSAGES_DEQUE = []
 RESPONSES = {}
+
+
+def json2data(response):
+    if isinstance(response, bytes):
+        response = response.decode()
+    return json.loads(response)
 
 
 def pretty_print(data):
@@ -108,11 +120,17 @@ class InWebhookHadler(BaseHandler):
         self.finish({})
 
     @staticmethod
-    def get_suggests(text):
-        return [
-            'Кредитная карта - банковская карта, по которой расходный лимит рассчитывается в пределах остатка средств на счете карты и размера кредита, предоставленного Банком.',
-            'Разрешенный овердрафт – кредит по счету карты, предоставленный Банком Держателю в соответствии с Условиями использования банковских карт в пределах установленного Банком лимита.'
-        ]
+    async def get_suggests(text):
+        client = AsyncHTTPClient()
+        data = urllib.parse.urlencode({
+            'q': text,
+            'n': 2
+        })
+        response = await client.fetch(
+            f'https://api.wit.ai/message?{data}',
+            headers={'Authorization': f'Bearer {options.WIT_TOKEN}'}
+        )
+        return [i['value'] for i in json2data(response)['entities']['intent']]
 
 
 class OutWebhookHadler(BaseHandler):
