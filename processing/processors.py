@@ -1,3 +1,5 @@
+from concurrent.futures import ThreadPoolExecutor
+
 import nltk
 import requests
 from nltk.tokenize import PunktSentenceTokenizer
@@ -5,6 +7,7 @@ import pymorphy2
 import string
 import re
 
+from tornado.concurrent import run_on_executor
 from tornado.escape import json_decode
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 
@@ -81,9 +84,10 @@ class POSTagger(BaseProcessor):
 
 
 class SyntaxTagger(BaseProcessor):
+    executor = ThreadPoolExecutor(max_workers=5)
 
-    @staticmethod
-    def process(text_object):
+    @run_on_executor
+    def process(self, text_object):
         tokens = text_object.get('sentence_tokens')
         if not tokens:
             text_object = SentenceTokenizer.process(text_object)

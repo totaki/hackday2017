@@ -1,9 +1,15 @@
+from concurrent.futures import ThreadPoolExecutor
+
 from pyaspeller.speller import YandexSpeller
+from tornado.concurrent import run_on_executor
 
 from utils import get_text
 
 
 class Speller(YandexSpeller):
+    executor = ThreadPoolExecutor(max_workers=5)
+
+    @run_on_executor
     def process(self, text_object):
         text = get_text(text_object)
         spelled_text = self.spell(text)

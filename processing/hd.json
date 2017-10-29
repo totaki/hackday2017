@@ -1,0 +1,143 @@
+{
+  text: "29 октября Иван Аркадьевич сделал тестовый запрос в апи",
+  prep_text: "29 октября Иван Аркадьевич сделал тестовый запрос в АПИ",
+  word_tokens: [
+    "29",
+    "октября",
+    "Иван",
+    "Аркадьевич",
+    "сделал",
+    "тестовый",
+    "запрос",
+    "в",
+    "АПИ"
+  ],
+  lemm_text: "29 октябрь иван аркадий сделать тестовый запрос в апи",
+  sentence_tokens: [
+    "29 октября Иван Аркадьевич сделал тестовый запрос в АПИ"
+  ],
+  syntax_tagging: [
+    [
+      {
+        index: "1",
+        POS: "NUM",
+        parent: "5",
+        RIS: "nmod"
+      },
+      {
+        index: "2",
+        POS: "NOUN",
+        parent: "1",
+        RIS: "nmod"
+      },
+      {
+        index: "3",
+        POS: "NOUN",
+        parent: "5",
+        RIS: "nsubj"
+      },
+      {
+        index: "4",
+        POS: "NOUN",
+        parent: "3",
+        RIS: "name"
+      },
+      {
+        index: "5",
+        POS: "VERB",
+        parent: "0",
+        RIS: "ROOT"
+      },
+      {
+        index: "6",
+        POS: "ADJ",
+        parent: "7",
+        RIS: "amod"
+      },
+      {
+        index: "7",
+        POS: "NOUN",
+        parent: "5",
+        RIS: "dobj"
+      },
+      {
+        index: "8",
+        POS: "ADP",
+        parent: "9",
+        RIS: "case"
+      },
+      {
+        index: "9",
+        POS: "PRON",
+        parent: "7",
+        RIS: "nmod"
+      }
+    ]
+  ],
+  pos_tagging: [
+    {
+      word: "29",
+      POS: null
+    },
+    {
+      word: "октября",
+      POS: "NOUN"
+    },
+    {
+      word: "Иван",
+      POS: "NOUN"
+    },
+    {
+      word: "Аркадьевич",
+      POS: "NOUN"
+    },
+    {
+      word: "сделал",
+      POS: "VERB"
+    },
+    {
+      word: "тестовый",
+      POS: "ADJF"
+    },
+    {
+      word: "запрос",
+      POS: "NOUN"
+    },
+    {
+      word: "в",
+      POS: "PREP"
+    },
+    {
+      word: "АПИ",
+      POS: null
+    }
+  ],
+  named_entities: [
+    {
+      span: [
+        0,
+        10
+      ],
+      fact: {
+        year: null,
+        month: "октябрь",
+        day: 29
+      }
+    },
+    {
+      span: [
+        11,
+        26
+      ],
+      fact: {
+        position: null,
+        name: {
+          first: "иван",
+          last: null,
+          middle: "аркадиевич",
+          nick: null
+        }
+      }
+    }
+  ]
+}
