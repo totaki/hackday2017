@@ -25,6 +25,7 @@ define('WIT_TOKEN', default=getenv('WIT_TOKEN', 1), type=str)
 
 MESSAGES_DEQUE = []
 RESPONSES = {}
+PREPROCESS_URL = 'http://localhost:9000/api/v1/pipelines?'
 
 
 def json2data(response):
@@ -96,6 +97,22 @@ class InWebhookHadler(BaseHandler):
     executor = ThreadPoolExecutor(max_workers=5)
 
     @coroutine
+    def preproccess(self, text):
+        data = urllib.parse.urlencode({
+            'text': text,
+            'processors': 'named_entities'
+        })
+        client = AsyncHTTPClient()
+        response = yield client.fetch(f'{PREPROCESS_URL}{data}')
+        response_data = json2data(response.body)
+        for en in response_data['named_entities']:
+            sl = en.get('span')
+            if sl:
+                put = '*' * sl[1] - sl[0]
+                text = text[0, sl[0]] + put + text[sl[1]:]
+        return text
+
+    @coroutine
     def post(self):
         activity = Activity.from_json(self.request.body)
         if options.debug:
@@ -116,9 +133,10 @@ class InWebhookHadler(BaseHandler):
                     'created_at': datetime.utcnow().timestamp()
                 }
                 suggests = yield self.get_suggests(activity.text)
+                text = yield self.preproccess(activity.text)
                 MESSAGES_DEQUE.extend([
                     {
-                        'text': activity.text,
+                        'text': text,
                         'suggests': suggests,
                         'id': id
                     }
