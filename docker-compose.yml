@@ -10,7 +10,7 @@ services:
       - MICROSOFT_APP_ID=${MICROSOFT_APP_ID}
       - MICROSOFT_APP_PASSWORD=${MICROSOFT_APP_PASSWORD}
       - debug=${debug}
-      - count_accept=1
+      - count_accept=${count_accept}
     volumes:
       - ./chat:/srv/chatapp
     command: "python3 main.py"
