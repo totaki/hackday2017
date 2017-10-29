@@ -95,12 +95,14 @@ class InWebhookHadler(BaseHandler):
                     'senders': [],
                     'created_at': datetime.utcnow().timestamp()
                 }
-                message = {
-                    'text': activity.text,
-                    'suggests': self.get_suggests(activity.text),
-                    'id': id
-                }
-                MESSAGES_DEQUE.extend([message] * int(options.count_accept))
+                MESSAGES_DEQUE.extend([
+                    {
+                        'text': activity.text,
+                        'suggests': self.get_suggests(activity.text),
+                        'id': id
+                    }
+                    for i in range(int(options.count_accept))
+                ])
         self.finish({})
 
     @staticmethod
