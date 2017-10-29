@@ -115,10 +115,11 @@ class InWebhookHadler(BaseHandler):
                     'senders': [],
                     'created_at': datetime.utcnow().timestamp()
                 }
+                suggests = yield self.get_suggests(activity.text)
                 MESSAGES_DEQUE.extend([
                     {
                         'text': activity.text,
-                        'suggests': (yield self.get_suggests(activity.text)),
+                        'suggests': suggests,
                         'id': id
                     }
                     for i in range(int(options.count_accept))
@@ -135,7 +136,7 @@ class InWebhookHadler(BaseHandler):
         url = f'https://api.wit.ai/message?{data}'
         headers = {'Authorization': f'Bearer {options.WIT_TOKEN}'}
         response = requests.get(url, headers=headers)
-        return [i['value'] for i in response.json()['entities']['intent']]
+        return [i.get('metadata', i['value']) for i in response.json()['entities']['intent']]
 
 
 class OutWebhookHadler(BaseHandler):
