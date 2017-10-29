@@ -99,6 +99,8 @@ class SyntaxTagger(BaseProcessor):
         for token in tokens:
             url = 'http://localhost:9999/parse?text={}'.format(token)
             response = requests.get(url)
+            if not response.status_code == 200:
+                continue
             parsed_data = response.json()
             # request = HTTPRequest('/parse?text={}'.format(token), request_timeout=30)
             # response = await http.fetch(request)
