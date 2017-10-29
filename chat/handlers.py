@@ -10,7 +10,7 @@ import tornado.web
 from os import getenv
 from collections import Counter
 
-from tornado.httpclient import AsyncHTTPClient
+from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 from tornado.ioloop import IOLoop
 from tornado.options import options, define
 from attr_dict import AttrDict
@@ -126,11 +126,11 @@ class InWebhookHadler(BaseHandler):
             'q': text,
             'n': 2
         })
-        response = await client.fetch(
-            method='XGET'
+        request = HTTPRequest(
             f'https://api.wit.ai/message?{data}',
-            headers={'Authorization': f'Bearer {options.WIT_TOKEN}'}
-        )
+            method='XGET',
+            headers={'Authorization': f'Bearer {options.WIT_TOKEN}'})
+        response = await client.fetch(request)
         return [i['value'] for i in json2data(response.body)['entities']['intent']]
 
 
