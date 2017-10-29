@@ -3,13 +3,17 @@ import pprint
 import urllib.parse
 import uuid
 import json
+from concurrent.futures import ThreadPoolExecutor
 
 from datetime import datetime
 
+import requests
 import tornado.web
 from os import getenv
 from collections import Counter
 
+from tornado.concurrent import run_on_executor
+from tornado.gen import coroutine
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 from tornado.ioloop import IOLoop
 from tornado.options import options, define
@@ -89,8 +93,10 @@ class StatusHandler(BaseHandler):
 
 
 class InWebhookHadler(BaseHandler):
+    executor = ThreadPoolExecutor(max_workers=5)
 
-    async def post(self):
+    @coroutine
+    def post(self):
         activity = Activity.from_json(self.request.body)
         if options.debug:
             pretty_print(activity.as_dict)
@@ -112,27 +118,24 @@ class InWebhookHadler(BaseHandler):
                 MESSAGES_DEQUE.extend([
                     {
                         'text': activity.text,
-                        'suggests': (await self.get_suggests(activity.text)),
+                        'suggests': (yield self.get_suggests(activity.text)),
                         'id': id
                     }
                     for i in range(int(options.count_accept))
                 ])
         self.finish({})
 
-    @staticmethod
-    # TODO: insert here
-    async def get_suggests(text):
-        client = AsyncHTTPClient()
+    # @staticmethod
+    @run_on_executor
+    def get_suggests(self, text):
         data = urllib.parse.urlencode({
             'q': text,
             'n': 2
         })
-        request = HTTPRequest(
-            f'https://api.wit.ai/message?{data}',
-            method='XGET',
-            headers={'Authorization': f'Bearer {options.WIT_TOKEN}'})
-        response = await client.fetch(request)
-        return [i['value'] for i in json2data(response.body)['entities']['intent']]
+        url = f'https://api.wit.ai/message?{data}'
+        headers = {'Authorization': f'Bearer {options.WIT_TOKEN}'}
+        response = requests.get(url, headers=headers)
+        return [i['value'] for i in response.json()['entities']['intent']]
 
 
 class OutWebhookHadler(BaseHandler):
