@@ -1,3 +1,4 @@
+import logging
 import pprint
 import uuid
 
@@ -11,7 +12,7 @@ from attr_dict import AttrDict
 define('count_accept', default=getenv('count_accept', 1), type=int)
 
 
-MESSAGES_DEQUE = deque()
+MESSAGES_DEQUE = []
 RESPONSES = {}
 
 
@@ -34,7 +35,7 @@ class Activity(AttrDict):
 def clean_store():
     global MESSAGES_DEQUE
     global RESPONSES
-    MESSAGES_DEQUE = deque()
+    MESSAGES_DEQUE = []
     RESPONSES = {}
 
 
@@ -56,6 +57,8 @@ class DropStateHandler(BaseHandler):
 class StatusHandler(BaseHandler):
 
     def get(self):
+        client_id = self.request.headers.get("clientId", None)
+        logging.warning(f'Request from clientId: {client_id}')
         try:
             message = MESSAGES_DEQUE.pop()
         except IndexError:
