@@ -14,6 +14,7 @@ from collections import Counter
 
 from tornado.concurrent import run_on_executor
 from tornado.gen import coroutine
+from tornado import gen
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 from tornado.ioloop import IOLoop
 from tornado.options import options, define
@@ -110,7 +111,7 @@ class InWebhookHadler(BaseHandler):
             if sl:
                 put = '*' * (sl[1] - sl[0])
                 text = text[0, sl[0]] + put + text[sl[1]:]
-        return text
+        raise gen.Return(text)
 
     @coroutine
     def post(self):
