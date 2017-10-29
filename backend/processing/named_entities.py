@@ -1,7 +1,7 @@
 from natasha import (NamesExtractor, DatesExtractor, MoneyExtractor, LocationExtractor, AddressExtractor,
                      OrganisationExtractor, PersonExtractor)
 
-from utils import get_text
+from processing.utils import get_text
 
 
 class NamedEntitiesExtractor:

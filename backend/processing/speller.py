@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pyaspeller.speller import YandexSpeller
 from tornado.concurrent import run_on_executor
 
-from utils import get_text
+from processing.utils import get_text
 
 
 class Speller(YandexSpeller):
