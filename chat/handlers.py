@@ -130,7 +130,7 @@ class InWebhookHadler(BaseHandler):
             f'https://api.wit.ai/message?{data}',
             headers={'Authorization': f'Bearer {options.WIT_TOKEN}'}
         )
-        return [i['value'] for i in json2data(response)['entities']['intent']]
+        return [i['value'] for i in json2data(response.body)['entities']['intent']]
 
 
 class OutWebhookHadler(BaseHandler):
