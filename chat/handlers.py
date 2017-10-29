@@ -1,10 +1,11 @@
 import logging
 import pprint
 import uuid
+from datetime import datetime
 
 import tornado.web
 from os import getenv
-from collections import deque, Counter
+from collections import Counter
 from tornado.ioloop import IOLoop
 from tornado.options import options, define
 from attr_dict import AttrDict
@@ -59,10 +60,16 @@ class StatusHandler(BaseHandler):
     def get(self):
         user_id = self.request.headers.get("userId", None)
         logging.warning(f'Request from userId: {user_id}')
-        try:
-            message = MESSAGES_DEQUE.pop()
-        except IndexError:
-            message = None
+        message = None
+        if len(MESSAGES_DEQUE):
+            index = -1
+            while abs(index) != len(MESSAGES_DEQUE):
+                message_ = MESSAGES_DEQUE[index]
+                responses = RESPONSES[message_['id']]
+                if user_id not in responses['senders']:
+                    message = MESSAGES_DEQUE.pop(index)
+                    break
+                index -= 1
         self.finish({'message': message})
 
 
@@ -81,7 +88,12 @@ class InWebhookHadler(BaseHandler):
                 )
             else:
                 id = uuid.uuid4().hex
-                RESPONSES[id] = {'activity': activity, 'responses': []}
+                RESPONSES[id] = {
+                    'activity': activity,
+                    'responses': [],
+                    'senders': [],
+                    'created_at': datetime.utcnow().timestamp()
+                }
                 message = {
                     'text': activity.text,
                     'suggests': self.get_suggests(activity.text),
@@ -101,19 +113,22 @@ class InWebhookHadler(BaseHandler):
 class OutWebhookHadler(BaseHandler):
 
     def post(self):
+        user_id = self.request.headers.get("userId", None)
         message = self.get_body_argument('response')
         id = self.get_body_argument('id')
-        response = RESPONSES[id]
-        response['responses'].append(message)
-        if len(response['responses']) == int(options.count_accept):
-            response_obj = RESPONSES.pop(id)
-            counts = Counter(response_obj['responses'])
-            max_possible = sorted(counts, key=lambda x: counts[x], reverse=True)
-            IOLoop.current().add_callback(
-                self.client.send_message,
-                response_obj['activity'],
-                max_possible[0]
-            )
+        response = RESPONSES.get(id, None)
+        if response:
+            response['responses'].append(message)
+            response['senders'].append(user_id)
+            if len(response['responses']) == int(options.count_accept):
+                response_obj = RESPONSES.pop(id)
+                counts = Counter(response_obj['responses'])
+                max_possible = sorted(counts, key=lambda x: counts[x], reverse=True)
+                IOLoop.current().add_callback(
+                    self.client.send_message,
+                    response_obj['activity'],
+                    max_possible[0]
+                )
         self.finish({})
 
 
