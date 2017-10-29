@@ -5,7 +5,7 @@ WORKDIR /srv/processing
 
 COPY ./requirements.txt /srv/processing/requirements.txt
 
-RUN cd /srv/chatapp \
+RUN cd /srv/processing \
     && pip install -r requirements.txt \
     && rm requirements.txt
 
