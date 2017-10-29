@@ -27,6 +27,7 @@ define('WIT_TOKEN', default=getenv('WIT_TOKEN', 1), type=str)
 MESSAGES_DEQUE = []
 RESPONSES = {}
 PREPROCESS_URL = 'http://localhost:9000/api/v1/pipelines?'
+MAIN_ANSWER = 'Вам понравилось презентация?'
 
 
 def json2data(response):
@@ -135,8 +136,12 @@ class InWebhookHadler(BaseHandler):
                     'senders': [],
                     'created_at': datetime.utcnow().timestamp()
                 }
-                suggests = yield self.get_suggests(activity.text)
-                text = yield self.preproccess(activity.text)
+                if activity.text != MAIN_ANSWER:
+                    suggests = yield self.get_suggests(activity.text)
+                    text = yield self.preproccess(activity.text)
+                else:
+                    suggests = ['Да', 'Нет']
+                    text = MAIN_ANSWER
                 MESSAGES_DEQUE.extend([
                     {
                         'text': text,
