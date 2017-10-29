@@ -18,7 +18,7 @@ services:
   syntaxnet:
     image: syntaxnet:0.1
     build:
-      context: proccesing/syntaxnet
+      context: ./proccesing/syntaxnet
     network_mode: host
     volumes:
       - ./processing/syntaxnet:/opt/tensorflow/syntaxnet
