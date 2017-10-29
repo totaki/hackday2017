@@ -104,6 +104,7 @@ class InWebhookHadler(BaseHandler):
             'processors': 'named_entities'
         })
         client = AsyncHTTPClient()
+        logging.warning(f'URL PREPROCCESS: {PREPROCESS_URL}{data}')
         response = yield client.fetch(f'{PREPROCESS_URL}{data}')
         response_data = json2data(response.body)
         for en in response_data['named_entities']:
@@ -111,6 +112,7 @@ class InWebhookHadler(BaseHandler):
             if sl:
                 put = '*' * (sl[1] - sl[0])
                 text = text[0, sl[0]] + put + text[sl[1]:]
+        logging.warning(text)
         raise gen.Return(text)
 
     @coroutine
