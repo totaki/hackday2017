@@ -72,7 +72,7 @@ class StatusHandler(BaseHandler):
                     logging.warning(f'Messages len after take {len(MESSAGES_DEQUE)}')
                     break
                 index -= 1
-        logging.warning(f'Taken {user_id} for {message or message["id"]}')
+        logging.warning(f'Taken {user_id} for {message and message["id"]}')
         self.finish({'message': message})
 
 
