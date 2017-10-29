@@ -15,6 +15,14 @@ services:
       - ./chat:/srv/chatapp
     command: "python3 main.py"
 
+  syntaxnet:
+    image: syntaxnet:0.1
+    build:
+      context: preproccesing/syntaxnet
+    network_mode: host
+    volumes:
+      - ./processing/syntaxnet:/opt/tensorflow/syntaxnet
+
   nginx:
     image: nginx:latest
     network_mode: host
