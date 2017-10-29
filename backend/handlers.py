@@ -24,5 +24,5 @@ class PipelinesHandler(tornado.web.RequestHandler):
                 text_object = yield mapper[processor].process(text_object)
             else:
                 text_object = mapper[processor].process(text_object)
-
+        print(text_object)
         self.finish(json.dumps(text_object))
