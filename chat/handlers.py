@@ -127,6 +127,7 @@ class InWebhookHadler(BaseHandler):
             'n': 2
         })
         response = await client.fetch(
+            method='XGET'
             f'https://api.wit.ai/message?{data}',
             headers={'Authorization': f'Bearer {options.WIT_TOKEN}'}
         )
