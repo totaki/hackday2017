@@ -2,7 +2,7 @@ import json
 import urllib.parse
 import logging
 from tornado.options import options
-from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+from tornado.httpclient import AsyncHTTPClient, HTTPRequest, HTTPError
 
 
 CONVERSATION_PATH = '{}/v3/conversations/{}/activities'
@@ -34,10 +34,17 @@ class SkypeClient(object):
         from_ = activity.recipient
         activity.update({'from': from_.as_dict, 'recipient': recipient.as_dict})
         activity.text = message
-        await self._post_json(
-            CONVERSATION_PATH.format(activity.serviceUrl, activity.conversation.id),
-            activity.to_json()
-        )
+        try:
+            await self._post_json(
+                CONVERSATION_PATH.format(activity.serviceUrl, activity.conversation.id),
+                activity.to_json()
+            )
+        except HTTPError:
+            self.remove_token()
+            await self._post_json(
+                CONVERSATION_PATH.format(activity.serviceUrl, activity.conversation.id),
+                activity.to_json()
+            )
 
     @property
     def access_token(self):

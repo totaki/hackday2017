@@ -1,18 +1,32 @@
+import logging
 import pprint
+import urllib.parse
 import uuid
+import json
+
+from datetime import datetime
 
 import tornado.web
 from os import getenv
-from collections import deque, Counter
+from collections import Counter
+
+from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 from tornado.ioloop import IOLoop
 from tornado.options import options, define
 from attr_dict import AttrDict
 
 define('count_accept', default=getenv('count_accept', 1), type=int)
+define('WIT_TOKEN', default=getenv('WIT_TOKEN', 1), type=str)
 
 
-MESSAGES_DEQUE = deque()
+MESSAGES_DEQUE = []
 RESPONSES = {}
+
+
+def json2data(response):
+    if isinstance(response, bytes):
+        response = response.decode()
+    return json.loads(response)
 
 
 def pretty_print(data):
@@ -34,7 +48,7 @@ class Activity(AttrDict):
 def clean_store():
     global MESSAGES_DEQUE
     global RESPONSES
-    MESSAGES_DEQUE = deque()
+    MESSAGES_DEQUE = []
     RESPONSES = {}
 
 
@@ -56,16 +70,27 @@ class DropStateHandler(BaseHandler):
 class StatusHandler(BaseHandler):
 
     def get(self):
-        try:
-            message = MESSAGES_DEQUE.pop()
-        except IndexError:
-            message = None
+        user_id = self.request.headers.get("userId", None)
+        logging.warning(f'Request from userId: {user_id}')
+        message = None
+        logging.warning(f'Messages len {len(MESSAGES_DEQUE)}')
+        if len(MESSAGES_DEQUE):
+            index = -1
+            while abs(index) <= len(MESSAGES_DEQUE):
+                message_ = MESSAGES_DEQUE[index]
+                responses = RESPONSES[message_['id']]
+                if user_id not in responses['senders']:
+                    message = MESSAGES_DEQUE.pop(index)
+                    logging.warning(f'Messages len after take {len(MESSAGES_DEQUE)}')
+                    break
+                index -= 1
+        logging.warning(f'Taken {user_id} for {message and message["id"]}')
         self.finish({'message': message})
 
 
 class InWebhookHadler(BaseHandler):
 
-    def post(self):
+    async def post(self):
         activity = Activity.from_json(self.request.body)
         if options.debug:
             pretty_print(activity.as_dict)
@@ -78,39 +103,57 @@ class InWebhookHadler(BaseHandler):
                 )
             else:
                 id = uuid.uuid4().hex
-                RESPONSES[id] = {'activity': activity, 'responses': []}
-                message = {
-                    'text': activity.text,
-                    'suggests': self.get_suggests(activity.text),
-                    'id': id
+                RESPONSES[id] = {
+                    'activity': activity,
+                    'responses': [],
+                    'senders': [],
+                    'created_at': datetime.utcnow().timestamp()
                 }
-                MESSAGES_DEQUE.extend([message] * int(options.count_accept))
+                MESSAGES_DEQUE.extend([
+                    {
+                        'text': activity.text,
+                        'suggests': (await self.get_suggests(activity.text)),
+                        'id': id
+                    }
+                    for i in range(int(options.count_accept))
+                ])
         self.finish({})
 
     @staticmethod
-    def get_suggests(text):
-        return [
-            'Кредитная карта - банковская карта, по которой расходный лимит рассчитывается в пределах остатка средств на счете карты и размера кредита, предоставленного Банком.',
-            'Разрешенный овердрафт – кредит по счету карты, предоставленный Банком Держателю в соответствии с Условиями использования банковских карт в пределах установленного Банком лимита.'
-        ]
+    async def get_suggests(text):
+        client = AsyncHTTPClient()
+        data = urllib.parse.urlencode({
+            'q': text,
+            'n': 2
+        })
+        request = HTTPRequest(
+            f'https://api.wit.ai/message?{data}',
+            method='XGET',
+            headers={'Authorization': f'Bearer {options.WIT_TOKEN}'})
+        response = await client.fetch(request)
+        return [i['value'] for i in json2data(response.body)['entities']['intent']]
 
 
 class OutWebhookHadler(BaseHandler):
 
     def post(self):
+        user_id = self.request.headers.get("userId", None)
         message = self.get_body_argument('response')
         id = self.get_body_argument('id')
-        response = RESPONSES[id]
-        response['responses'].append(message)
-        if len(response['responses']) == int(options.count_accept):
-            response_obj = RESPONSES.pop(id)
-            counts = Counter(response_obj['responses'])
-            max_possible = sorted(counts, key=lambda x: counts[x], reverse=True)
-            IOLoop.current().add_callback(
-                self.client.send_message,
-                response_obj['activity'],
-                max_possible[0]
-            )
+        response = RESPONSES.get(id, None)
+        if response:
+            response['responses'].append(message)
+            response['senders'].append(user_id)
+            logging.warning(f'Response from {user_id} for {id}')
+            if len(response['responses']) == int(options.count_accept):
+                response_obj = RESPONSES.pop(id)
+                counts = Counter(response_obj['responses'])
+                max_possible = sorted(counts, key=lambda x: counts[x], reverse=True)
+                IOLoop.current().add_callback(
+                    self.client.send_message,
+                    response_obj['activity'],
+                    max_possible[0]
+                )
         self.finish({})
 
 

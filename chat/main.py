@@ -1,3 +1,4 @@
+import logging
 from os import getenv
 import tornado.ioloop
 import tornado.web
@@ -42,6 +43,7 @@ if __name__ == "__main__":
     options.parse_command_line()
     app = make_app()
     app.listen(options.port)
-    print(f'Debug mode: {options.debug}')
-    print(f'Start server port: {options.port}')
+    logging.warning(f'Debug mode: {options.debug}')
+    logging.warning(f'Start server port: {options.port}')
+    logging.warning(f'Count accept: {options.count_accept}')
     tornado.ioloop.IOLoop.current().start()
