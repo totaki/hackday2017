@@ -9,7 +9,7 @@ RUN cd /srv/processing \
     && pip install -r requirements.txt \
     && rm requirements.txt
 
-RUN python -c "import nltk;nltk.download('punct')"
+RUN python -c "import nltk;nltk.download('punkt')"
 
 CMD ["python", "main.py"]
 EXPOSE 9000
