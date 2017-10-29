@@ -61,6 +61,7 @@ class StatusHandler(BaseHandler):
         user_id = self.request.headers.get("userId", None)
         logging.warning(f'Request from userId: {user_id}')
         message = None
+        logging.warning(f'Messages len {len(MESSAGES_DEQUE)}')
         if len(MESSAGES_DEQUE):
             index = -1
             while abs(index) <= len(MESSAGES_DEQUE):
@@ -68,6 +69,7 @@ class StatusHandler(BaseHandler):
                 responses = RESPONSES[message_['id']]
                 if user_id not in responses['senders']:
                     message = MESSAGES_DEQUE.pop(index)
+                    logging.warning(f'Messages len after take {len(MESSAGES_DEQUE)}')
                     break
                 index -= 1
         logging.warning(f'Taken {user_id} for {message["id"]}')
