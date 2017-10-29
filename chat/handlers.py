@@ -57,8 +57,8 @@ class DropStateHandler(BaseHandler):
 class StatusHandler(BaseHandler):
 
     def get(self):
-        client_id = self.request.headers.get("clientId", None)
-        logging.warning(f'Request from clientId: {client_id}')
+        user_id = self.request.headers.get("userId", None)
+        logging.warning(f'Request from userId: {user_id}')
         try:
             message = MESSAGES_DEQUE.pop()
         except IndexError:
