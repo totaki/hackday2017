@@ -1,9 +1,13 @@
+from concurrent.futures import ThreadPoolExecutor
+
 import nltk
+import requests
 from nltk.tokenize import PunktSentenceTokenizer
 import pymorphy2
 import string
 import re
 
+from tornado.concurrent import run_on_executor
 from tornado.escape import json_decode
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 
@@ -80,19 +84,27 @@ class POSTagger(BaseProcessor):
 
 
 class SyntaxTagger(BaseProcessor):
+    executor = ThreadPoolExecutor(max_workers=5)
 
-    @staticmethod
-    async def process(text_object):
+    @run_on_executor
+    def process(self, text_object):
         tokens = text_object.get('sentence_tokens')
         if not tokens:
-            text_object = WordTokenizer.process(text_object)
+            text_object = SentenceTokenizer.process(text_object)
             tokens = text_object['sentence_tokens']
         result = []
+
         http = AsyncHTTPClient()
+
         for token in tokens:
-            request = HTTPRequest('http://localhost:9999/parse?text={}'.format(token), request_timeout=30)
-            response = await http.fetch(request)
-            parsed_data = json_decode(response.body)
+            url = 'http://localhost:9999/parse?text={}'.format(token)
+            response = requests.get(url)
+            if not response.status_code == 200:
+                continue
+            parsed_data = response.json()
+            # request = HTTPRequest('/parse?text={}'.format(token), request_timeout=30)
+            # response = await http.fetch(request)
+            # parsed_data = json_decode(response.body)
             result.append(parsed_data)
         text_object.update({'syntax_tagging': result})
         print(text_object)
