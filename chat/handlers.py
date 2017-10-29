@@ -108,7 +108,7 @@ class InWebhookHadler(BaseHandler):
         for en in response_data['named_entities']:
             sl = en.get('span')
             if sl:
-                put = '*' * sl[1] - sl[0]
+                put = '*' * (sl[1] - sl[0])
                 text = text[0, sl[0]] + put + text[sl[1]:]
         return text
 
