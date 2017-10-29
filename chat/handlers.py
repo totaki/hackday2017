@@ -70,6 +70,7 @@ class StatusHandler(BaseHandler):
                     message = MESSAGES_DEQUE.pop(index)
                     break
                 index -= 1
+        logging.warning(f'Taken {user_id} for {message["id"]}')
         self.finish({'message': message})
 
 
@@ -120,6 +121,7 @@ class OutWebhookHadler(BaseHandler):
         if response:
             response['responses'].append(message)
             response['senders'].append(user_id)
+            logging.warning(f'Response from {user_id} for {id}')
             if len(response['responses']) == int(options.count_accept):
                 response_obj = RESPONSES.pop(id)
                 counts = Counter(response_obj['responses'])
