@@ -90,7 +90,7 @@ class StatusHandler(BaseHandler):
 
 class InWebhookHadler(BaseHandler):
 
-    def post(self):
+    async def post(self):
         activity = Activity.from_json(self.request.body)
         if options.debug:
             pretty_print(activity.as_dict)
@@ -112,7 +112,7 @@ class InWebhookHadler(BaseHandler):
                 MESSAGES_DEQUE.extend([
                     {
                         'text': activity.text,
-                        'suggests': self.get_suggests(activity.text),
+                        'suggests': (await self.get_suggests(activity.text)),
                         'id': id
                     }
                     for i in range(int(options.count_accept))
