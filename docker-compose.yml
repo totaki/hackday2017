@@ -2,7 +2,7 @@ version: "2"
 
 services:
   chatapp:
-    image: mashrooms:0.2
+    image: mashrooms:0.3
     build:
       context: ./chat
     network_mode: host

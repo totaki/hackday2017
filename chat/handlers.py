@@ -135,7 +135,7 @@ class InWebhookHadler(BaseHandler):
         url = f'https://api.wit.ai/message?{data}'
         headers = {'Authorization': f'Bearer {options.WIT_TOKEN}'}
         response = requests.get(url, headers=headers)
-        return [i['value'] for i in response.json()['entities']['intent']]
+        return [i.get('metadata', i['value']) for i in response.json()['entities']['intent']]
 
 
 class OutWebhookHadler(BaseHandler):
