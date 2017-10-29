@@ -1523,9 +1523,8 @@
       margin-right: 7.5px;
       padding: 6px;
       border-bottom: solid 2px transparent;
-      height: -webkit-fit-content;
-      height: -moz-fit-content;
-      height: fit-content;
+      /*height: fit-content;*/
+      height: 1.5em;
     }
 .pipeline-result___3YX3s .tokens___2HEV6 .token___3p5nW.named___GbCp5 {
         border-bottom-color: red;
