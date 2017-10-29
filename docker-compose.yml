@@ -21,8 +21,6 @@ services:
     build:
       context: ./processing/syntaxnet
     network_mode: host
-    volumes:
-      - ./processing/syntaxnet:/opt/tensorflow/syntaxnet
 
   processing:
     image: processing:0.1
